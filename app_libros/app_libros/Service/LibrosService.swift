@@ -7,10 +7,10 @@
 
 import Foundation
 
-class ShoesService {
+class LibrosService {
 
-    func getShoes(for gender: String, completion: @escaping ([GenderShoes]?, String?) -> Void) {
-        let url = "https://sugary-wool-penguin.glitch.me/shoes?gender=\(gender.uppercased())"
+    func getLibros(for libro: String, completion: @escaping ([Libros]?, String?) -> Void) {
+        let url = "https://rest-ai-app-default-rtdb.firebaseio.com/libros"
         
         HttpRequestHelper().GET(url: url) { success, data, message in
             
@@ -21,7 +21,7 @@ class ShoesService {
                 }
                 
                 do {
-                    let apiResponse = try JSONDecoder().decode([GenderShoes].self, from: data)
+                    let apiResponse = try JSONDecoder().decode([Libros].self, from: data)
                     completion(apiResponse, nil)
                 } catch let error {
                     completion(nil, "Error: \(error.localizedDescription)")

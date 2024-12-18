@@ -1,14 +1,7 @@
-//
-//  FavoriteListView.swift
-//  app_libros
-//
-//  Created by DAMII on 17/12/24.
-//
-
 import SwiftUI
 
 struct FavoriteListView: View {
-    @EnvironmentObject var viewModel: ShoesListViewModel
+    @EnvironmentObject var viewModel: LibrosListViewModel
     
     var body: some View {
         ZStack {
@@ -21,7 +14,7 @@ struct FavoriteListView: View {
             .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading) {
-                Text("Favorites")
+                Text("Favoritos")
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.orange)
@@ -30,17 +23,17 @@ struct FavoriteListView: View {
                 
                 if viewModel.favorites.isEmpty {
                     Spacer()
-                    Text("No favorites yet!")
+                    Text("¡Aún no tienes favoritos!")
                         .foregroundColor(.gray)
                         .font(.headline)
                         .frame(maxWidth: .infinity, alignment: .center)
                     Spacer()
                 } else {
                     List {
-                        ForEach(viewModel.favorites) { shoe in
+                        ForEach(viewModel.favorites) { libro in
                             HStack {
-                                // Imagen y detalles del zapato
-                                AsyncImage(url: URL(string: shoe.image)) { image in
+                                // Imagen y detalles del libro
+                                AsyncImage(url: URL(string: libro.imageUrl)) { image in
                                     image
                                         .resizable()
                                         .scaledToFit()
@@ -53,20 +46,19 @@ struct FavoriteListView: View {
                                 }
                                 
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("$\(shoe.price)")
+                                    Text(libro.title)
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    Text(libro.autor)
                                         .font(.subheadline)
-                                        .fontWeight(.bold)
+                                        .foregroundColor(.gray)
+                                    Text("\(libro.ano, specifier: "%.0f")")
+                                        .font(.footnote)
                                         .foregroundColor(.white)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
                                         .background(Color.orange)
                                         .cornerRadius(8)
-                                    Text(shoe.name)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                    Text("Women")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
                                 }
                                 Spacer()
                             }
@@ -77,9 +69,9 @@ struct FavoriteListView: View {
                             .listRowSeparator(.hidden)
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
-                                    viewModel.removeFavorite(shoe: shoe)
+                                    viewModel.removeFavorite(libro: libro)
                                 } label: {
-                                    Label("Delete", systemImage: "trash.fill")
+                                    Label("Eliminar", systemImage: "trash.fill")
                                 }
                                 .tint(.red)
                             }
@@ -92,9 +84,8 @@ struct FavoriteListView: View {
     }
 }
 
-
 // Preview
 #Preview {
     FavoriteListView()
-        .environmentObject(ShoesListViewModel())
+        .environmentObject(LibrosListViewModel())
 }

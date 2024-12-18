@@ -18,7 +18,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 }
 
 @main
-struct app_librosApp: App {
+struct applibrosApp: App {
     let persistenceController = PersistenceController.shared
     @StateObject private var viewModel = LibrosListViewModel() // Usar @StateObject
 

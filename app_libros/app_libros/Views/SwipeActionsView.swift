@@ -10,16 +10,16 @@ import Foundation
 import SwiftUI
 
 struct SwipeActionsView<Content: View>: View {
-    var shoe: GenderShoes 
+    var libro: Libros
     var content: () -> Content
-    @EnvironmentObject var viewModel: ShoesListViewModel
+    @EnvironmentObject var viewModel: LibrosListViewModel
     var body: some View {
     ZStack {
             HStack {
                 Spacer()
                 Button(action: {
 
-                    viewModel.removeFavorite(shoe: shoe)
+                    viewModel.removeFavorite(libro: libro)
 
                 }) {
 
@@ -47,7 +47,7 @@ struct SwipeActionsView<Content: View>: View {
 
             Button(role: .destructive) {
 
-                viewModel.removeFavorite(shoe: shoe)
+                viewModel.removeFavorite(libro: libro)
 
             } label: {
 

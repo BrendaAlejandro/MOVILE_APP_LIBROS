@@ -1,16 +1,9 @@
-//
-//  ShoesListViewModel.swift
-//  app_libros
-//
-//  Created by DAMII on 17/12/24.
-//
-
 import Foundation
 import CoreData
 
-class ShoesListViewModel: ObservableObject {
-    @Published var shoes: [GenderShoes] = [] // Lista de zapatos
-    @Published var favorites: [GenderShoes] = [] // Lista de favoritos
+class LibrosListViewModel: ObservableObject {
+    @Published var libros: [Libros] = [] // Lista de libros
+    @Published var favorites: [Libros] = [] // Lista de favoritos
     
     private var context: NSManagedObjectContext = PersistenceController.shared.container.viewContext
     
@@ -18,11 +11,12 @@ class ShoesListViewModel: ObservableObject {
         loadFavorites() // Cargar favoritos al iniciar
     }
     
-    func getShoes(for gender: String) {
+    // Función para obtener libros desde un servicio
+    func getLibros(for genero: String) {
         DispatchQueue.main.async {
-            ShoesService().getShoes(for: gender) { shoes, message in
-                if let shoes = shoes {
-                    self.shoes = shoes
+            LibrosService().getLibros(for: genero) { libros, message in
+                if let libros = libros {
+                    self.libros = libros
                 } else if let message = message {
                     print("Error: \(message)")
                 }
@@ -30,41 +24,42 @@ class ShoesListViewModel: ObservableObject {
         }
     }
     
-    func toggleFavorite(shoe: GenderShoes) {
-        if let index = shoes.firstIndex(where: { $0.id == shoe.id }) {
-            shoes[index].isFavorite.toggle()
+    // Alternar el estado de favorito de un libro
+    func toggleFavorite(libro: Libros) {
+        if let index = libros.firstIndex(where: { $0.id == libro.id }) {
+            libros[index].isFavorite.toggle()
             
-            if shoes[index].isFavorite {
-                addFavorite(shoe: shoes[index])
+            if libros[index].isFavorite {
+                addFavorite(libro: libros[index])
             } else {
-                removeFavorite(shoe: shoes[index])
+                removeFavorite(libro: libros[index])
             }
         }
     }
     
-    // Agregar un zapato a favoritos en Core Data
-    private func addFavorite(shoe: GenderShoes) {
+    // Agregar un libro a favoritos en Core Data
+    func addFavorite(libro: Libros) {
         let newFavorite = Item(context: context)
-        newFavorite.id = Int64(shoe.id)
-        newFavorite.name = shoe.name
-        newFavorite.brand = shoe.brand
-        newFavorite.gender = shoe.gender
-        newFavorite.category = shoe.category
-        newFavorite.price = Int64(shoe.price)
-        newFavorite.image = shoe.image
+        newFavorite.id = Int64(libro.id)
+        newFavorite.autor = libro.autor
+        newFavorite.title = libro.title
+        newFavorite.descripcion = libro.descripcion
+        newFavorite.ano = libro.ano
+        newFavorite.genero = libro.genero
+        newFavorite.imageUrl = libro.imageUrl
         
-        favorites.append(shoe)
+        favorites.append(libro)
         saveContext()
     }
     
-    // Eliminar un zapato de favoritos en Core Data
-    func removeFavorite(shoe: GenderShoes) {
-        if let index = favorites.firstIndex(where: { $0.id == shoe.id }) {
+    // Eliminar un libro de favoritos en Core Data
+    func removeFavorite(libro: Libros) {
+        if let index = favorites.firstIndex(where: { $0.id == libro.id }) {
             favorites.remove(at: index)
         }
         
         let fetchRequest: NSFetchRequest<Item> = Item.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %d", shoe.id)
+        fetchRequest.predicate = NSPredicate(format: "id == %d", libro.id)
         
         do {
             let items = try context.fetch(fetchRequest)
@@ -78,20 +73,20 @@ class ShoesListViewModel: ObservableObject {
     }
     
     // Cargar los favoritos desde Core Data
-    private func loadFavorites() {
+    func loadFavorites() {
         let fetchRequest: NSFetchRequest<Item> = Item.fetchRequest()
         
         do {
             let savedItems = try context.fetch(fetchRequest)
             favorites = savedItems.map { item in
-                GenderShoes(
+                Libros(
                     id: Int(item.id),
-                    name: item.name ?? "",
-                    brand: item.brand ?? "",
-                    gender: item.gender ?? "",
-                    category: item.category ?? "",
-                    price: Int32(item.price),
-                    image: item.image ?? "",
+                    autor: item.autor ?? "",
+                    title: item.title ?? "",
+                    descripcion: item.descripcion ?? "",
+                    ano: item.ano,
+                    genero: item.genero ?? "",
+                    imageUrl: item.imageUrl ?? "",
                     isFavorite: true
                 )
             }
@@ -110,4 +105,3 @@ class ShoesListViewModel: ObservableObject {
         }
     }
 }
-

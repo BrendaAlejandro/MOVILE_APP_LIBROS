@@ -7,24 +7,24 @@
 
 import Foundation
 
-struct GenderShoes: Identifiable, Decodable {
+struct GenderLibros: Identifiable, Decodable {
     let id: Int
-    let name: String
-    let brand: String
-    let gender: String
-    let category: String
-    let price: Int32
-    let image: String
+    let autor: String
+    let title: String
+    let descripcion: String
+    let año: Double
+    let genero: String
+    let imageUrl: String
     var isFavorite: Bool = false
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
-        case name = "name"
-        case brand = "brand"
-        case gender = "gender"
-        case category = "category"
-        case image = "image"
-        case price = "price"
+        case autor = "name"
+        case title = "brand"
+        case descripcion = "gender"
+        case año = "category"
+        case genero = "image"
+        case imageUrl = "price"
     }
 }
 

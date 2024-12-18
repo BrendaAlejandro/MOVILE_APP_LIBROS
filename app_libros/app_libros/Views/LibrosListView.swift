@@ -1,21 +1,14 @@
-//
-//  ShoeListView.swift
-//  app_libros
-//
-//  Created by DAMII on 17/12/24.
-//
-
 import SwiftUI
 
-struct ShoeListView: View {
-    @EnvironmentObject var viewModel: ShoesListViewModel // Usar EnvironmentObject
-    @State private var selectedTab: String = "Women" // Pestaña seleccionada
-    @State private var selectedBottomTab: String = "Shoes" // Pestaña inferior seleccionada
+struct LibrosListView: View {
+    @EnvironmentObject var viewModel: LibrosListViewModel // Usar EnvironmentObject
+    @State private var selectedTab: String = "Romance" // Pestaña seleccionada
+    @State private var selectedBottomTab: String = "Libros" // Pestaña inferior seleccionada
     
     var body: some View {
         VStack {
-            if selectedBottomTab == "Shoes" {
-                shoesView
+            if selectedBottomTab == "Libros" {
+                librosView
             } else if selectedBottomTab == "Favorites" {
                 FavoriteListView()
                     .environmentObject(viewModel)
@@ -25,21 +18,21 @@ struct ShoeListView: View {
         }
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .onAppear {
-            viewModel.getShoes(for: selectedTab.uppercased())
+            viewModel.getLibros(for: selectedTab)
         }
     }
     
-    private var shoesView: some View {
+    private var librosView: some View {
         VStack {
             headerView
             tabSelectionView
-            shoeGridView
+            libroGridView
         }
     }
     
     private var headerView: some View {
         HStack {
-            Text("EazyShoes")
+            Text("Biblioteca")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.orange)
@@ -50,10 +43,10 @@ struct ShoeListView: View {
     
     private var tabSelectionView: some View {
         HStack(spacing: 16) {
-            ForEach(["Women", "Men", "Kids"], id: \.self) { tab in
+            ForEach(["Romance", "Ficción", "Misterio"], id: \.self) { tab in
                 Button(action: {
                     selectedTab = tab
-                    viewModel.getShoes(for: tab.uppercased()) // Carga zapatos según el género
+                    viewModel.getLibros(for: tab) // Carga libros según el género
                 }) {
                     Text(tab)
                         .font(.headline)
@@ -74,21 +67,21 @@ struct ShoeListView: View {
         .padding(.vertical)
     }
     
-    private var shoeGridView: some View {
+    private var libroGridView: some View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                ForEach(viewModel.shoes) { shoe in
-                    shoeCardView(shoe: shoe)
+                ForEach(viewModel.libros) { libro in
+                    libroCardView(libro: libro)
                 }
             }
             .padding()
         }
     }
     
-    private func shoeCardView(shoe: GenderShoes) -> some View {
+    private func libroCardView(libro: Libros) -> some View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 8) {
-                AsyncImage(url: URL(string: shoe.image)) { image in
+                AsyncImage(url: URL(string: libro.imageUrl)) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -100,24 +93,23 @@ struct ShoeListView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("$\(shoe.price)")
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.orange)
-                        .cornerRadius(8)
-                    
-                    Text(shoe.name)
+                    Text(libro.title)
                         .font(.headline)
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(.white)
                     
-                    Text(shoe.brand)
+                    Text(libro.autor)
                         .font(.subheadline)
                         .foregroundColor(.gray)
+                    
+                    Text("\(libro.ano, specifier: "%.0f")")
+                        .font(.footnote)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.orange)
+                        .cornerRadius(8)
                 }
                 .padding(.horizontal, 8)
             }
@@ -126,10 +118,10 @@ struct ShoeListView: View {
             .cornerRadius(12)
             
             Button(action: {
-                toggleFavorite(for: shoe)
+                toggleFavorite(for: libro)
             }) {
-                Image(systemName: shoe.isFavorite ? "heart.fill" : "heart")
-                    .foregroundColor(shoe.isFavorite ? .orange : .gray)
+                Image(systemName: libro.isFavorite ? "heart.fill" : "heart")
+                    .foregroundColor(libro.isFavorite ? .orange : .gray)
                     .padding(8)
             }
         }
@@ -139,14 +131,14 @@ struct ShoeListView: View {
         HStack {
             Spacer()
             Button(action: {
-                selectedBottomTab = "Shoes"
+                selectedBottomTab = "Libros"
             }) {
                 VStack {
-                    Image(systemName: "figure.walk")
-                        .foregroundColor(selectedBottomTab == "Shoes" ? .orange : .gray)
-                    Text("Shoes")
+                    Image(systemName: "book.fill")
+                        .foregroundColor(selectedBottomTab == "Libros" ? .orange : .gray)
+                    Text("Libros")
                         .font(.footnote)
-                        .foregroundColor(selectedBottomTab == "Shoes" ? .orange : .gray)
+                        .foregroundColor(selectedBottomTab == "Libros" ? .orange : .gray)
                 }
             }
             Spacer()
@@ -158,7 +150,7 @@ struct ShoeListView: View {
                 VStack {
                     Image(systemName: "heart")
                         .foregroundColor(selectedBottomTab == "Favorites" ? .orange : .gray)
-                    Text("Favorites")
+                    Text("Favoritos")
                         .font(.footnote)
                         .foregroundColor(selectedBottomTab == "Favorites" ? .orange : .gray)
                 }
@@ -169,11 +161,11 @@ struct ShoeListView: View {
         .background(Color.black.opacity(0.8))
     }
     
-    private func toggleFavorite(for shoe: GenderShoes) {
-        viewModel.toggleFavorite(shoe: shoe)
+    private func toggleFavorite(for libro: Libros) {
+        viewModel.toggleFavorite(libro: libro)
     }
 }
 
 #Preview {
-    ShoeListView()
+    LibrosListView()
 }
